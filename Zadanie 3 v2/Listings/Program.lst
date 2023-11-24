@@ -1,0 +1,93 @@
+A51 MACRO ASSEMBLER  PROGRAM                                                              03/31/2023 19:46:14 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Program.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Program.a51 SET(SMALL) DEBUG PRINT(.\Listings\Program.lst) OBJECT(.\Obj
+                      ects\Program.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     MY_KILLING_COPY SEGMENT CODE    ; Ulokowanie kodu w najbardziej wygodnym (wg asemblera)
+                       2                                                                     ; miejscu w pamieci kodu.
+  0030                 3     Bufor DATA 30h
+  003A                 4     BuforKoniec DATA 3ah                    ; 30h + 0ah
+  0007                 5     j Data 7
+  000A                 6     k Data 10
+  000A                 7     IleDanych EQU 10
+                       8     
+----                   9     CSEG AT 0
+0000 020000   F       10     JMP start
+                      11     
+----                  12     RSEG MY_KILLING_COPY
+0000                  13             start:
+0000 7830             14                     MOV R0,#Bufor           ; Przeniesienie adresu Cel do Rejestru R0.
+0002 7A0A             15                     MOV R2,#IleDanych       ; Przeniesienie stalej IleDanych do Rejestru R2.
+0004 900000   F       16                     MOV DPTR,#etykieta      ; Zaladowanie adresu pierwszego elementu tablicy da
+                             nych.
+                      17                                                             ; Etykieta do wskaznika.
+                      18             ; Inicjowanie generatora liczb pseudolosowych
+0007                  19             inicjuj:
+0007 E4               20                     CLR A                   ; Wyczyszczenie Akumulatora.
+0008 93               21                     MOVC A,@A+DPTR  ; Przeniesienie z komorki pamieci programu do akumulatora.
+0009 F6               22                     MOV @R0,A               ; Przeniesienie zawartosci Akumulatora
+                      23                                                     ; do komorki RAM o adresie w Rejestrze R0.
+000A A3               24                     INC DPTR                ; Inkrementacja wskaznika.
+000B 08               25                     INC R0                  ; Inkrementacja adresu w Rejestrze R0.
+000C DAF9             26                     DJNZ R2,inicjuj ; Dekrementacja zawartosci Rejestru R2
+                      27                                                     ; Nastepna iteracja petli, jesli wartosc R2
+                              rozna od 0.
+                      28                                                     
+                      29             ; Przygotuj do generowania
+000E 7830             30             MOV R0, #Bufor
+0010 7430             31             MOV A, #Bufor
+0012 240A             32             ADD A, #k
+0014 9407             33             SUBB A, #j
+0016 F9               34             MOV R1, A                       ; Pozycja drugiego rejestru (i(0) + k - j)
+                      35             
+                      36             ; Generowanie
+0017                  37             petla:
+0017 E6               38                     MOV A, @R0
+0018 27               39                     ADD A, @R1
+0019 5403             40                     ANL A, #3 ; Liczba z zakresu 0-3
+001B F6               41                     MOV @R0, A
+001C 08               42                     INC R0
+001D B83A02           43                     CJNE R0, #BuforKoniec, inc_r1   ; W zakresie - pominiecie resetu bufora
+0020 7830             44                     MOV R0, #Bufor
+0022                  45             inc_r1:
+0022 09               46                     INC R1
+0023 B93A02           47                     CJNE R1, #BuforKoniec, kontynuuj ; W zakresie - pominiecie resetu bufora
+0026 7930             48                     MOV R1, #Bufor
+0028                  49             kontynuuj:
+0028 80ED             50                     SJMP petla
+                      51     
+002A 04050303         52             etykieta: db 4, 5, 3, 3, 3, 4, 6, 2, 6, 5
+002E 03040602                
+0032 0605                    
+                      53     END
+A51 MACRO ASSEMBLER  PROGRAM                                                              03/31/2023 19:46:14 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+BUFOR. . . . . . .  D ADDR   0030H   A   
+BUFORKONIEC. . . .  D ADDR   003AH   A   
+ETYKIETA . . . . .  C ADDR   002AH   R   SEG=MY_KILLING_COPY
+ILEDANYCH. . . . .  N NUMB   000AH   A   
+INC_R1 . . . . . .  C ADDR   0022H   R   SEG=MY_KILLING_COPY
+INICJUJ. . . . . .  C ADDR   0007H   R   SEG=MY_KILLING_COPY
+J. . . . . . . . .  D ADDR   0007H   A   
+K. . . . . . . . .  D ADDR   000AH   A   
+KONTYNUUJ. . . . .  C ADDR   0028H   R   SEG=MY_KILLING_COPY
+MY_KILLING_COPY. .  C SEG    0034H       REL=UNIT
+PETLA. . . . . . .  C ADDR   0017H   R   SEG=MY_KILLING_COPY
+START. . . . . . .  C ADDR   0000H   R   SEG=MY_KILLING_COPY
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

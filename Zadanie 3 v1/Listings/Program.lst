@@ -1,0 +1,99 @@
+A51 MACRO ASSEMBLER  PROGRAM                                                              04/01/2023 15:56:11 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Program.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Program.a51 SET(SMALL) DEBUG PRINT(.\Listings\Program.lst) OBJECT(.\Obj
+                      ects\Program.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     MY_KILLING_COPY SEGMENT CODE    ; Ulokowanie kodu w najbardziej dogodnym miejscu.
+                       2             
+  0030                 3     Bufor DATA 30h                                  ; Poczatek obszaru na liczby pseudolosowe.
+  003A                 4     BuforKoniec DATA 3ah                    ; Koniec obszaru (pierwsza komorka poza zakresem).
+  0007                 5     j Data 7                                                ; Do wskazania miejsca na druga lic
+                             zbe.
+  000A                 6     k Data 10                                               ; Do wskazania miejsca na druga lic
+                             zbe.
+  000A                 7     IleDanych EQU 10                                ; Ilosc liczb poczatkowych i generowanych.
+                       8     
+----                   9     CSEG AT 0
+0000 020000   F       10     JMP start
+                      11     
+----                  12     RSEG MY_KILLING_COPY
+0000                  13             start:
+0000 7830             14                     MOV R0,#Bufor                   ; Przeniesienie adresu Cel do R0.
+0002 7A0A             15                     MOV R2,#IleDanych               ; Przeniesienie stalej IleDanych do R2.
+0004 900000   F       16                     MOV DPTR,#liczby_start  ; Tablica (pierwszy element) do wskaznika.
+                      17                                                             
+                      18             ; Inicjowanie generatora liczb pseudolosowych.
+0007                  19             inicjuj:
+0007 E4               20                     CLR A                   ; Wyczyszczenie Akumulatora.
+0008 93               21                     MOVC A,@A+DPTR  ; Przeniesienie z komorki pamieci programu do akumulatora.
+0009 F6               22                     MOV @R0,A               ; Przeniesienie zawartosci Akumulatora do komorki.
+000A A3               23                     INC DPTR                ; Inkrementacja wskaznika.
+000B 08               24                     INC R0                  ; Inkrementacja adresu w R0.
+000C DAF9             25                     DJNZ R2,inicjuj ; Dekrementacja R2. Nastepna iteracja petli, jesli mozliwe.
+                      26                                                     
+                      27             ; Przygotuj do generowania.
+000E 7830             28             MOV R0, #Bufor          ; Jeden ze skladnikow liczby, nadpisywany.
+0010 7430             29             MOV A, #Bufor           ; Przygotowanie drugiego ze skladnikow liczby.
+0012 240A             30             ADD A, #k                       
+0014 9407             31             SUBB A, #j                      
+0016 F9               32             MOV R1, A                       ; Drugi ze skladnikow liczby (i(0) + k - j).
+                      33             
+                      34             ; Generowanie liczb pseudolosowych.
+0017                  35             petla:
+0017 E6               36                     MOV A, @R0                                                      ; Pierwszy 
+                             skladnik liczby.
+0018 27               37                     ADD A, @R1                                                      ; Drugi skl
+                             adnik liczby.
+0019 5403             38                     ANL A, #3                                                       ; Maska AND
+                              - liczba z zakresu 0-3.
+001B F6               39                     MOV @R0, A                                                      ; Zapisanie
+                              liczby w IRAM.
+001C 08               40                     INC R0
+001D B83A02           41                     CJNE R0, #BuforKoniec, inc_r1           ; Przeskocz, jesli R0 poza obszarem.
+0020 7830             42                     MOV R0, #Bufor                                          ; Zresetuj do pocza
+                             tku obszaru.
+0022                  43             inc_r1:
+0022 09               44                     INC R1
+0023 B93A02           45                     CJNE R1, #BuforKoniec, kontynuuj        ; Przeskocz, jesli R1 poza obszarem.
+0026 7930             46                     MOV R1, #Bufor                                          ; Zresetuj do pocza
+                             tku obszaru.
+0028                  47             kontynuuj:
+0028 80ED             48                     SJMP petla
+                      49     
+A51 MACRO ASSEMBLER  PROGRAM                                                              04/01/2023 15:56:11 PAGE     2
+
+002A 04050303         50             liczby_start: db 4, 5, 3, 3, 3, 4, 6, 2, 6, 5   ; Poczatkowe liczby
+002E 03040602                
+0032 0605                    
+                      51     END
+A51 MACRO ASSEMBLER  PROGRAM                                                              04/01/2023 15:56:11 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+BUFOR. . . . . . .  D ADDR   0030H   A   
+BUFORKONIEC. . . .  D ADDR   003AH   A   
+ILEDANYCH. . . . .  N NUMB   000AH   A   
+INC_R1 . . . . . .  C ADDR   0022H   R   SEG=MY_KILLING_COPY
+INICJUJ. . . . . .  C ADDR   0007H   R   SEG=MY_KILLING_COPY
+J. . . . . . . . .  D ADDR   0007H   A   
+K. . . . . . . . .  D ADDR   000AH   A   
+KONTYNUUJ. . . . .  C ADDR   0028H   R   SEG=MY_KILLING_COPY
+LICZBY_START . . .  C ADDR   002AH   R   SEG=MY_KILLING_COPY
+MY_KILLING_COPY. .  C SEG    0034H       REL=UNIT
+PETLA. . . . . . .  C ADDR   0017H   R   SEG=MY_KILLING_COPY
+START. . . . . . .  C ADDR   0000H   R   SEG=MY_KILLING_COPY
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
